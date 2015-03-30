@@ -1,0 +1,13 @@
+name: nginx-proxy
+summary: small, powerful, scalable web/proxy server
+maintainer: Marco Ceppi <marco@ceppi.net>
+description: |
+  This charm installs nginx-full and when combined with nginx-site, nginx-php, or nginx-python will allow you to deploy independant VirtualHosts and scale those out.
+categories:
+  - application
+requires:
+  reverseproxy:
+    interface: http
+provides:
+  website-engine:
+    interface: http

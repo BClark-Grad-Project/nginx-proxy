@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -eux
+
+tpl=`cat etc/default-vhost.tpl`
+
+remote_unit_safe=${JUJU_REMOTE_UNIT/\//-}
+
+remote_ns=${remote_unit_safe.*([^\.]+)(com|net|org|info|coop|int|co\.uk|org\.uk|ac\.uk|uk)$}
+
+if [ -z "$remote_unit_safe" ]; then
+  juju-log "Could not create a safe name, are you invoking out of band?"
+  exit 1
+fi
+
+mkdir -p /srv/$remote_unit_safe
+chown -R www-data.www-data /srv
+
+if [ ! -f /etc/nginx/sites-enabled/$remote_unit_safe ]; then
+  ln -s ../sites-available/$remote_unit_safe /etc/nginx/sites-enabled/$remote_unit_safe
+fi
+
+relation-set unit-name="$remote_unit_safe" remote-ns="$remote_ns" default-tpl="$tpl" 
+
+service nginx configtest && service nginx reload
